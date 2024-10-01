@@ -40,13 +40,27 @@ jobs:
 
       - name: Security Image Scan
         run: |
-          docker run --rm \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -v ${{ github.workspace }}:${{ github.workspace }} \
-            -w ${{ github.workspace }} \
-            aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL \
-            --format json \
-            --output trivy-report.html ${{ github.event.repository.name }}
+          max_attempts=5
+          attempt=1
+      
+          while (( attempt <= max_attempts ))
+          do
+            echo "Attempt $attempt of $max_attempts..."
+            if docker run --rm aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL --format json ${{ github.event.repository.name }}; then
+              echo "Trivy scan completed successfully."
+              break
+            else
+              echo "Attempt $attempt failed. Retrying..."
+              ((attempt++))
+              sleep 10 
+            fi
+      
+            if (( attempt > max_attempts )); then
+              echo "Failed after $max_attempts attempts."
+              exit 1
+            fi
+          done
+
 
 
 
