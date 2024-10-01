@@ -19,7 +19,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git docker-compose trivy
+          sudo apt-get install -y git docker-compose 
 
       - name: SonarQube Analysis
         env:
@@ -40,10 +40,14 @@ jobs:
 
       - name: Security Image Scan
         run: |
-          curl -L -o html.tpl https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl
-          trivy image --exit-code 0 --severity HIGH,CRITICAL \
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v ${{ github.workspace }}:${{ github.workspace }} \
+            -w ${{ github.workspace }} \
+            aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL \
             --format template --template @html.tpl \
             --output trivy-report.html ${{ github.event.repository.name }}
+
 
       - name: Push to Nexus
         env:
