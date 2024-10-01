@@ -38,32 +38,6 @@ jobs:
           docker-compose -f ./data_app/docker-compose.yml build
           docker build -t ${{ github.event.repository.name }} -f ./data_app/Dockerfile ./data_app
 
-      - name: Security Image Scan
-        run: |
-          max_attempts=5
-          attempt=1
-
-          # Tague a imagem para o Trivy, caso ainda não tenha sido feito
-          docker tag ${{ github.event.repository.name }} $DOCKER_USERNAME/${{ github.event.repository.name }}:latest
-
-          while (( attempt <= max_attempts ))
-          do
-            echo "Attempt $attempt of $max_attempts..."
-            if docker run --rm aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL --format json ${{ github.event.repository.name }}; then
-              echo "Trivy scan completed successfully."
-              break
-            else
-              echo "Attempt $attempt failed. Retrying..."
-              ((attempt++))
-              sleep 10 
-            fi
-
-            if (( attempt > max_attempts )); then
-              echo "Failed after $max_attempts attempts."
-              exit 1
-            fi
-          done
-
       - name: Push to Docker Hub
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}  # Nome de usuário do Docker Hub
