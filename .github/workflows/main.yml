@@ -42,7 +42,10 @@ jobs:
         run: |
           max_attempts=5
           attempt=1
-      
+
+          # Tague a imagem para o Trivy, caso ainda não tenha sido feito
+          docker tag ${{ github.event.repository.name }} $DOCKER_USERNAME/${{ github.event.repository.name }}:latest
+
           while (( attempt <= max_attempts ))
           do
             echo "Attempt $attempt of $max_attempts..."
@@ -54,15 +57,12 @@ jobs:
               ((attempt++))
               sleep 10 
             fi
-      
+
             if (( attempt > max_attempts )); then
               echo "Failed after $max_attempts attempts."
               exit 1
             fi
           done
-
-
-
 
       - name: Push to Docker Hub
         env:
@@ -75,7 +75,6 @@ jobs:
           docker tag ${{ github.event.repository.name }} $DOCKER_USERNAME/${{ github.event.repository.name }}:V${{ github.run_number }}
           docker push $DOCKER_USERNAME/${{ github.event.repository.name }}:V${{ github.run_number }}
 
-
       - name: Deploy Application
         run: |
           docker-compose -f ./data_app/docker-compose.yml up -d
@@ -83,7 +82,6 @@ jobs:
       - name: Smoke Test
         run: |
           docker run --rm -v ./postman:/etc/newman -t postman/newman run /etc/newman/${{ github.event.repository.name }}.json -r cli
-
 
       - name: Upload Artifacts
         env:
