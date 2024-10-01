@@ -45,8 +45,9 @@ jobs:
             -v ${{ github.workspace }}:${{ github.workspace }} \
             -w ${{ github.workspace }} \
             aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL \
-            --format template --template @html.tpl \
+            --format table \
             --output trivy-report.html ${{ github.event.repository.name }}
+
 
 
       - name: Push to Nexus
