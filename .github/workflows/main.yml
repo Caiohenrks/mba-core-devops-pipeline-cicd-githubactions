@@ -45,7 +45,7 @@ jobs:
             -v ${{ github.workspace }}:${{ github.workspace }} \
             -w ${{ github.workspace }} \
             aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL \
-            --format json,cli \
+            --format json \
             --output trivy-report.html ${{ github.event.repository.name }}
 
 
