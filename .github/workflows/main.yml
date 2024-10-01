@@ -45,22 +45,22 @@ jobs:
             -v ${{ github.workspace }}:${{ github.workspace }} \
             -w ${{ github.workspace }} \
             aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL \
-            --format table \
+            --format json,cli \
             --output trivy-report.html ${{ github.event.repository.name }}
 
 
 
-      - name: Push to Nexus
+      - name: Push to Docker Hub
         env:
-          NEXUS_URL: 'http://192.168.50.30:8082'
-          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
-          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}  # Nome de usuário do Docker Hub
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  # Senha do Docker Hub
         run: |
-          docker login -u $NEXUS_USERNAME -p $NEXUS_PASSWORD $NEXUS_URL
-          docker tag ${{ github.event.repository.name }} $NEXUS_URL/docker/${{ github.event.repository.name }}:latest
-          docker push $NEXUS_URL/docker/${{ github.event.repository.name }}:latest
-          docker tag ${{ github.event.repository.name }} $NEXUS_URL/docker/${{ github.event.repository.name }}:V${{ github.run_number }}
-          docker push $NEXUS_URL/docker/${{ github.event.repository.name }}:V${{ github.run_number }}
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          docker tag ${{ github.event.repository.name }} $DOCKER_USERNAME/${{ github.event.repository.name }}:latest
+          docker push $DOCKER_USERNAME/${{ github.event.repository.name }}:latest
+          docker tag ${{ github.event.repository.name }} $DOCKER_USERNAME/${{ github.event.repository.name }}:V${{ github.run_number }}
+          docker push $DOCKER_USERNAME/${{ github.event.repository.name }}:V${{ github.run_number }}
+
 
       - name: Deploy Application
         run: |
