@@ -19,7 +19,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git docker-compose
+          sudo apt-get install -y git docker-compose trivy
 
       - name: SonarQube Analysis
         env:
