@@ -68,10 +68,8 @@ jobs:
 
       - name: Smoke Test
         run: |
-          docker run -v ./postman:/etc/newman --user 0 -t newman-reporter run /etc/newman/${{ github.event.repository.name }}.json -r htmlextra
-          mkdir -p artifacts
-          mv ./postman/newman/* artifacts/
-          mv ./trivy-report.html artifacts/
+          docker run --rm -v ./postman:/etc/newman -t postman/newman run /etc/newman/${{ github.event.repository.name }}.json -r cli
+
 
       - name: Upload Artifacts
         env:
