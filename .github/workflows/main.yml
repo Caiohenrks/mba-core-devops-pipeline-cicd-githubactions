@@ -26,7 +26,10 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git docker-compose 
+          sudo apt-get install -y git curl
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
 
   sonar-analysis:
     runs-on: ubuntu-latest
@@ -48,10 +51,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: install-dependencies
     steps:
-      - name: Build Docker Image
+      - name: Build Docker Image with Buildx
         run: |
-          docker-compose -f ./data_app/docker-compose.yml build
-          docker build -t qrcode-api -f ./data_app/Dockerfile ./data_app
+          docker buildx build --platform linux/amd64,linux/arm64 \
+            -t qrcode-api:latest \
+            -f ./data_app/Dockerfile ./data_app \
+            --push
 
   push-docker-hub:
     runs-on: ubuntu-latest
