@@ -74,10 +74,11 @@ jobs:
   
       - name: Install Trivy
         run: |
+          sudo apt-get install -y wget apt-transport-https gnupg
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
           sudo apt-get update
-          sudo apt-get install -y git
-          # Baixando o Trivy
-          curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+          sudo apt-get install -y trivy
   
       - name: Download HTML Template
         run: curl -L -o html.tpl https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl
@@ -91,6 +92,7 @@ jobs:
   
           # Descomente a linha abaixo se você também quiser gerar um relatório JSON
           # trivy image --exit-code 0 --severity HIGH,CRITICAL --format json --output trivy-report.json ${{ github.event.repository.name }}
+
 
 
   push-image:
