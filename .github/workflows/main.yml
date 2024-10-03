@@ -84,14 +84,7 @@ jobs:
           trivy image --exit-code 0 --severity HIGH,CRITICAL \
           --format template --template @html.tpl \
           --output trivy-report.html ${{ github.event.repository.name }}
-    
-          # (Opcional) Para gerar o relatório em formato JSON
-          # - name: Run Trivy Image Scan (JSON)
-          #   run: |
-          #     trivy image --exit-code 0 --severity HIGH,CRITICAL \
-          #     --format json \
-          #     --output trivy-report.json ${{ github.event.repository.name }}
-    
+  
           - name: Upload Trivy Report
             uses: actions/upload-artifact@v2
             with:
