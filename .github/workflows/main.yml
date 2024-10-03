@@ -67,32 +67,31 @@ jobs:
   security-scan:
     runs-on: ubuntu-latest
     needs: build
-
+  
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-
+  
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git
+          # Baixando o Trivy
+          curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+  
+      - name: Download HTML Template
+        run: curl -L -o html.tpl https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl
+  
       - name: Security Image Scan
         run: |
-          max_attempts=5
-          attempt=1
+          # Rodando a verificação de segurança
+          trivy image --exit-code 0 --severity HIGH,CRITICAL \
+          --format template --template @html.tpl \
+          --output trivy-report.html ${{ github.event.repository.name }}
+  
+          # Descomente a linha abaixo se você também quiser gerar um relatório JSON
+          # trivy image --exit-code 0 --severity HIGH,CRITICAL --format json --output trivy-report.json ${{ github.event.repository.name }}
 
-          while (( attempt <= max_attempts )); do
-            echo "Attempt $attempt of $max_attempts..."
-            if sudo docker run --rm aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL --format json ${{ github.event.repository.name }}; then
-              echo "Trivy scan completed successfully."
-              break
-            else
-              echo "Attempt $attempt failed. Retrying..."
-              ((attempt++))
-              sleep 10 
-            fi
-          done
-
-          if (( attempt > max_attempts )); then
-            echo "Failed after $max_attempts attempts."
-            exit 1
-          fi
 
   push-image:
     runs-on: ubuntu-latest
