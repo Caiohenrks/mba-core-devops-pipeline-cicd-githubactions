@@ -88,12 +88,6 @@ jobs:
           trivy image --exit-code 0 --severity HIGH,CRITICAL \
           --format template --template @html.tpl \
           --output trivy-report.html ${{ github.event.repository.name }}:latest
-  
-      - name: Upload Trivy Report
-        uses: actions/upload-artifact@v2
-        with:
-          name: trivy-report
-          path: trivy-report.html
 
 
 
