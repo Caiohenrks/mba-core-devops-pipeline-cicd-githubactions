@@ -66,37 +66,37 @@ jobs:
 
   security-scan:
     runs-on: ubuntu-latest
-
+  
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-
+  
       - name: Install Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.55.2
-
+  
       - name: Download Trivy Template
         run: |
           curl -L -o html.tpl https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl
-
+  
       - name: Run Trivy Image Scan
         run: |
           trivy image --exit-code 0 --severity HIGH,CRITICAL \
           --format template --template @html.tpl \
           --output trivy-report.html ${{ github.event.repository.name }}
-
-      # (Opcional) Para gerar o relatório em formato JSON
-      # - name: Run Trivy Image Scan (JSON)
-      #   run: |
-      #     trivy image --exit-code 0 --severity HIGH,CRITICAL \
-      #     --format json \
-      #     --output trivy-report.json ${{ github.event.repository.name }}
-
-      - name: Upload Trivy Report
-        uses: actions/upload-artifact@v2
-        with:
-          name: trivy-report
-          path: trivy-report.html
+    
+          # (Opcional) Para gerar o relatório em formato JSON
+          # - name: Run Trivy Image Scan (JSON)
+          #   run: |
+          #     trivy image --exit-code 0 --severity HIGH,CRITICAL \
+          #     --format json \
+          #     --output trivy-report.json ${{ github.event.repository.name }}
+    
+          - name: Upload Trivy Report
+            uses: actions/upload-artifact@v2
+            with:
+              name: trivy-report
+              path: trivy-report.html
 
 
 
