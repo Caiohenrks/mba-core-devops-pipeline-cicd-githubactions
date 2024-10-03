@@ -53,12 +53,13 @@ jobs:
 
   build-docker-image:
     runs-on: ubuntu-latest
-    needs: [setup-buildx, install-dependencies]
+    needs: setup-buildx
     steps:
       - name: Build Docker Image
         run: |
-          docker-compose -f ./data_app/docker-compose.yml build
+          docker compose -f ./data_app/docker-compose.yml build
           docker build -t ${{ github.event.repository.name }} -f ./data_app/Dockerfile ./data_app
+
 
   security-scan:
     runs-on: ubuntu-latest
