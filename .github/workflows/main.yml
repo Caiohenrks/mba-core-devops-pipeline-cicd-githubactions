@@ -79,7 +79,7 @@ jobs:
 
           while (( attempt <= max_attempts )); do
             echo "Attempt $attempt of $max_attempts..."
-            if docker run --rm aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL --format json ${{ github.event.repository.name }}; then
+            if sudo docker run --rm aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL --format json ${{ github.event.repository.name }}; then
               echo "Trivy scan completed successfully."
               break
             else
